@@ -1,6 +1,5 @@
 # Copyright 2021 ETH Zurich and the NPBench authors. All rights reserved.
 import pkg_resources
-import dpctl
 
 from npbench.infrastructure import Benchmark, Framework
 from typing import Any, Callable, Dict
@@ -15,7 +14,8 @@ class DpnpFramework(Framework):
         """
 
         super().__init__(fname)
-        d = dpctl.select_cpu_device()
+        import dpctl
+        d = dpctl.select_default_device()
         d.print_device_info()
 
     def version(self) -> str:

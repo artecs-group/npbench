@@ -1,4 +1,4 @@
-import numpy as np
+import dpnp as np
 
 
 def build_up_b(rho, dt, dx, dy, u, v):
@@ -34,7 +34,7 @@ def pressure_poisson_periodic(nit, p, dx, dy, b):
     pn = np.empty_like(p)
 
     for q in range(nit):
-        pn = p.copy()
+        pn = np.copy(p)
         p[1:-1, 1:-1] = (((pn[1:-1, 2:] + pn[1:-1, 0:-2]) * dy**2 +
                           (pn[2:, 1:-1] + pn[0:-2, 1:-1]) * dx**2) /
                          (2 * (dx**2 + dy**2)) - dx**2 * dy**2 /
@@ -62,12 +62,10 @@ def channel_flow(nit, u, v, dt, dx, dy, p, rho, nu, F):
     stepcount = 0
 
     while udiff > .001:
-        un = u.copy()
-        vn = v.copy()
-
+        un = np.copy(u)
+        vn = np.copy(v)
         b = build_up_b(rho, dt, dx, dy, u, v)
         pressure_poisson_periodic(nit, p, dx, dy, b)
-
         u[1:-1,
           1:-1] = (un[1:-1, 1:-1] - un[1:-1, 1:-1] * dt / dx *
                    (un[1:-1, 1:-1] - un[1:-1, 0:-2]) -
@@ -79,7 +77,6 @@ def channel_flow(nit, u, v, dt, dx, dy, p, rho, nu, F):
                     dt / dy**2 *
                     (un[2:, 1:-1] - 2 * un[1:-1, 1:-1] + un[0:-2, 1:-1])) +
                    F * dt)
-
         v[1:-1,
           1:-1] = (vn[1:-1, 1:-1] - un[1:-1, 1:-1] * dt / dx *
                    (vn[1:-1, 1:-1] - vn[1:-1, 0:-2]) -
@@ -100,7 +97,6 @@ def channel_flow(nit, u, v, dt, dx, dy, p, rho, nu, F):
             (dt / dx**2 *
              (un[1:-1, 0] - 2 * un[1:-1, -1] + un[1:-1, -2]) + dt / dy**2 *
              (un[2:, -1] - 2 * un[1:-1, -1] + un[0:-2, -1])) + F * dt)
-
         # Periodic BC u @ x = 0
         u[1:-1,
           0] = (un[1:-1, 0] - un[1:-1, 0] * dt / dx *
